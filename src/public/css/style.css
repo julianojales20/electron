@@ -1,0 +1,23 @@
+#btnModal {
+  width: 128px;
+  height: 128px;
+  background-image: url("../img/pc.png");
+  background-color: transparent;
+  background-size: cover;
+  border: none;
+}
+
+footer {
+  width: 100%;
+  height: 50px;
+  text-align: center;
+  background-color: #007acc;
+  position: fixed;
+  bottom: 0;
+}
+
+footer p {
+  color: #fff;
+  font-size: 1.25em;
+  padding-top: 7px;
+}
