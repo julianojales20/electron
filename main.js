@@ -8,6 +8,8 @@ const {
   nativeTheme,
   Menu,
   shell,
+  ipcMain,
+  dialog,
 } = require("electron");
 const path = require("node:path");
 
@@ -19,8 +21,8 @@ const createWindow = () => {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
   const win = new BrowserWindow({
-    width: Math.floor(width),
-    height: Math.floor(height),
+    width: Math.floor(width * 0.6),
+    height: Math.floor(height * 0.6),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
@@ -69,6 +71,57 @@ const childWindow = () => {
 app.whenReady().then(() => {
   createWindow();
   //aboutWindow();
+
+  //IPC >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+  ipcMain.on("open-child", () => {
+    childWindow();
+  });
+
+  ipcMain.on("renderer-message", (event, message) => {
+    console.log(`Processo principal recebeu uma mensagem: ${message}`);
+    event.reply("main-message", "Olá! Renderizador");
+  });
+
+  ipcMain.on("dialog-info", () => {
+    dialog.showMessageBox({
+      type: "info",
+      title: "Informação",
+      message: "Mensagem",
+      buttons: ["OK"],
+    });
+  });
+
+  ipcMain.on("dialog-warning", () => {
+    dialog
+      .showMessageBox({
+        type: "warning",
+        title: "Aviso",
+        message: "Confirma esta ação!",
+        buttons: ["Sim", "Não"],
+        defaultId: 0,
+      })
+      .then((result) => {
+        console.log(result);
+        if (result.response === 0) {
+          console.log("confirmado");
+        }
+      });
+  });
+
+  ipcMain.on("dialog-select", () => {
+    dialog
+      .showOpenDialog({
+        properties: ["openDirectory"],
+      })
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  });
+
+  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {

@@ -1,7 +1,13 @@
-const { contextBridge } = require("electron");
+const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("api", {
   verElectron: () => process.versions.electron,
+  open: () => ipcRenderer.send("open-child"),
+  send: (message) => ipcRenderer.send("renderer-message", message),
+  on: (message) => ipcRenderer.on("main-message", message),
+  info: () => ipcRenderer.send("dialog-info"),
+  warning: () => ipcRenderer.send("dialog-warning"),
+  select: () => ipcRenderer.send("dialog-select"),
 });
 
 //Manipulação do DOM
